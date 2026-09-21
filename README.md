@@ -24,7 +24,7 @@ This fork introduces **Hetero-IsaacLab**, a specialized architecture for trainin
 
 Most physics simulators and RL frameworks assume homogeneity, making it difficult to train universal controllers. This repository bridges that gap, providing concrete advantages:
 * **Morphology-Agnostic Feature Learning:** The policy is forced to learn fundamental locomotion principles that transcend specific hardware morphologies rather than memorizing robot-specific quirks.
-* **Efficient Multi-Platform Deployment:** Training 8 quadruped or 4+ humanoid robot types heterogeneously uses the same compute as training 1 robot type, eliminating the need to maintain separate codebases and models.
+* **Efficient Multi-Platform Deployment:** Training 8 quadruped or 5 humanoid robot types heterogeneously uses the same compute as training 1 robot type, eliminating the need to maintain separate codebases and models.
 * **Better Exploration:** Different morphologies explore different regions of the state-action space naturally (e.g., varying leg lengths, weights, and joint actuation limits discover robust, versatile gaits).
 
 ### Key Architecture Features

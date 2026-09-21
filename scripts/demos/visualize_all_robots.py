@@ -9,7 +9,7 @@ import subprocess
 
 from isaaclab.app import AppLauncher
 
-parser = argparse.ArgumentParser(description="Visualize all 12 robots in one scene.")
+parser = argparse.ArgumentParser(description="Visualize all 13 robots in one scene.")
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
 
@@ -188,6 +188,7 @@ def main():
     os.rmdir("tmp_frames")
 
     print(f"[SUCCESS] Unified GIF saved to {out_path}")
+    simulation_app.close()
 
 
 if __name__ == "__main__":
