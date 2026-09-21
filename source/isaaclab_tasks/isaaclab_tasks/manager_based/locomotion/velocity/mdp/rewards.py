@@ -68,6 +68,33 @@ def feet_air_time_positive_biped(env, command_name: str, threshold: float, senso
     return reward
 
 
+def feet_air_time_symmetry_biped(
+    env: ManagerBasedRLEnv, command_name: str, sensor_cfg: SceneEntityCfg, yaw_std: float = 0.25
+) -> torch.Tensor:
+    """Penalize asymmetry in feet air time for bipeds during straight walking.
+
+    This function penalizes differences in air time between the left and right foot upon landing,
+    preventing asymmetric strides (limping). It is smoothly gated by turning commands so that
+    differential strides needed for sharp turns are not penalized.
+    """
+    contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
+    commands = env.command_manager.get_command(command_name)
+    yaw_cmd = commands[:, 2]
+    straight_gating = torch.exp(-torch.square(yaw_cmd) / (2 * (yaw_std**2)))
+    is_moving = torch.norm(commands[:, :2], dim=1) > 0.1
+
+    feet_ids = sensor_cfg.body_ids
+    first_contact = contact_sensor.compute_first_contact(env.step_dt)[:, feet_ids]
+    any_first_contact = torch.any(first_contact, dim=1)
+
+    last_air_time = contact_sensor.data.last_air_time[:, feet_ids]
+    both_feet_stepped = (last_air_time[:, 0] > 0.0) & (last_air_time[:, 1] > 0.0)
+    air_diff = torch.abs(last_air_time[:, 0] - last_air_time[:, 1])
+
+    penalty = air_diff * any_first_contact * both_feet_stepped * straight_gating * is_moving
+    return penalty
+
+
 def feet_slide(env, sensor_cfg: SceneEntityCfg, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
     """Penalize feet sliding.
 

@@ -3,7 +3,6 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-import math
 
 from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
@@ -38,11 +37,20 @@ class H2Rewards(RewardsCfg):
     )
     feet_air_time = RewTerm(
         func=mdp.feet_air_time_positive_biped,
-        weight=0.5,
+        weight=1.5,
         params={
             "command_name": "base_velocity",
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_pitch_link"),
-            "threshold": 0.4,
+            "threshold": 0.32,
+        },
+    )
+    gait_symmetry = RewTerm(
+        func=mdp.feet_air_time_symmetry_biped,
+        weight=-15.0,
+        params={
+            "command_name": "base_velocity",
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_pitch_link"),
+            "yaw_std": 0.25,
         },
     )
     feet_slide = RewTerm(
@@ -69,7 +77,7 @@ class H2Rewards(RewardsCfg):
     # Penalize deviation from default of the joints that are not essential for locomotion
     joint_deviation_hip = RewTerm(
         func=mdp.joint_deviation_l1,
-        weight=-0.1,
+        weight=-0.25,
         params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_hip_yaw_joint", ".*_hip_roll_joint"])},
     )
     # Strongly penalize lateral waist roll to prevent upper body swinging left/right
@@ -77,6 +85,12 @@ class H2Rewards(RewardsCfg):
         func=mdp.joint_deviation_l1,
         weight=-1.5,
         params={"asset_cfg": SceneEntityCfg("robot", joint_names="waist_roll_joint")},
+    )
+    # Penalize waist pitch to prevent laying back or pitching forward
+    joint_deviation_waist_pitch = RewTerm(
+        func=mdp.joint_deviation_l1,
+        weight=-1.0,
+        params={"asset_cfg": SceneEntityCfg("robot", joint_names="waist_pitch_joint")},
     )
     joint_deviation_waist_yaw = RewTerm(
         func=mdp.joint_deviation_l1,
@@ -89,14 +103,19 @@ class H2Rewards(RewardsCfg):
         weight=-0.2,
         params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*_shoulder_roll_joint")},
     )
+    # Light penalty on shoulder pitch to allow natural sagittal arm swing during locomotion
+    joint_deviation_shoulder_pitch = RewTerm(
+        func=mdp.joint_deviation_l1,
+        weight=-0.01,
+        params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*_shoulder_pitch_joint")},
+    )
     joint_deviation_arms = RewTerm(
         func=mdp.joint_deviation_l1,
-        weight=-0.05,
+        weight=-0.1,
         params={
             "asset_cfg": SceneEntityCfg(
                 "robot",
                 joint_names=[
-                    ".*_shoulder_pitch_joint",
                     ".*_shoulder_yaw_joint",
                     ".*_elbow_joint",
                 ],
@@ -105,12 +124,12 @@ class H2Rewards(RewardsCfg):
     )
     joint_deviation_wrists = RewTerm(
         func=mdp.joint_deviation_l1,
-        weight=-0.005,
+        weight=-0.1,
         params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*_wrist_.*")},
     )
     joint_deviation_head = RewTerm(
         func=mdp.joint_deviation_l1,
-        weight=-0.02,
+        weight=-0.2,
         params={"asset_cfg": SceneEntityCfg("robot", joint_names="head_.*")},
     )
 
@@ -165,7 +184,7 @@ class H2RoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.ang_vel_xy_l2.weight = -0.2
         self.rewards.undesired_contacts = None
         self.rewards.flat_orientation_l2.weight = -1.5
-        self.rewards.action_rate_l2.weight = -0.002
+        self.rewards.action_rate_l2.weight = -0.005
         self.rewards.dof_acc_l2.weight = -2.5e-7
         self.rewards.dof_acc_l2.params["asset_cfg"] = SceneEntityCfg(
             "robot", joint_names=[".*_hip_.*", ".*_knee_joint"]

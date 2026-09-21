@@ -317,12 +317,8 @@ This configuration removes most collision meshes to speed up simulation.
 """
 
 
-_H2_LOCAL_USD = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "../../data/Robots/Unitree/H2/H2_dae.usd")
-)
-H2_USD_PATH = (
-    _H2_LOCAL_USD if os.path.exists(_H2_LOCAL_USD) else f"{ISAACLAB_NUCLEUS_DIR}/Robots/Unitree/H2/h2.usd"
-)
+_H2_LOCAL_USD = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data/Robots/Unitree/H2/H2_dae.usd"))
+H2_USD_PATH = _H2_LOCAL_USD if os.path.exists(_H2_LOCAL_USD) else f"{ISAACLAB_NUCLEUS_DIR}/Robots/Unitree/H2/h2.usd"
 
 
 # Unitree H2 Actuator Motor Constants (derived from natural frequency 10Hz, damping ratio 2.0)
@@ -368,11 +364,13 @@ H2_CFG = ArticulationCfg(
             ".*_hip_pitch_joint": -0.312,
             ".*_knee_joint": 0.669,
             ".*_ankle_pitch_joint": -0.363,
+            "waist_pitch_joint": 0.0,
+            "waist_roll_joint": 0.0,
+            "waist_yaw_joint": 0.0,
             ".*_elbow_joint": 0.6,
-            "left_shoulder_roll_joint": 0.2,
-            "left_shoulder_pitch_joint": 0.2,
-            "right_shoulder_roll_joint": -0.2,
-            "right_shoulder_pitch_joint": 0.2,
+            ".*_shoulder_pitch_joint": 0.0,
+            ".*_shoulder_roll_joint": 0.0,
+            ".*_shoulder_yaw_joint": 0.0,
         },
         joint_vel={".*": 0.0},
     ),
@@ -425,12 +423,12 @@ H2_CFG = ArticulationCfg(
             armature=2.0 * _H2_ARMATURE_5020,
         ),
         "waist": ImplicitActuatorCfg(
-            joint_names_expr=["waist_roll_joint"],
-            effort_limit_sim=150.0,
+            joint_names_expr=["waist_roll_joint", "waist_pitch_joint"],
+            effort_limit_sim=200.0,
             velocity_limit_sim=37.0,
-            stiffness=2.0 * _H2_STIFFNESS_5020,
-            damping=2.0 * _H2_DAMPING_5020,
-            armature=2.0 * _H2_ARMATURE_5020,
+            stiffness=200.0,
+            damping=5.0,
+            armature=0.01,
         ),
         "waist_yaw": ImplicitActuatorCfg(
             joint_names_expr=["waist_yaw_joint"],

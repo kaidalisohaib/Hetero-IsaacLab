@@ -1,3 +1,8 @@
+# Copyright (c) 2022-2026, The Isaac Lab Project Developers (https://github.com/isaac-sim/IsaacLab/blob/main/CONTRIBUTORS.md).
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
 # Copyright (c) 2022-2026, The Isaac Lab Project Developers.
 # All rights reserved.
 #
@@ -9,7 +14,6 @@ import argparse
 import os
 import shutil
 import subprocess
-import sys
 import urllib.request
 
 REPO_ID = "unitreerobotics/unitree_model"
@@ -155,4 +159,3 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     ensure_h2_assets(args.target_dir)
-

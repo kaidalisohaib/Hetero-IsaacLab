@@ -22,8 +22,8 @@ class H2FlatEnvCfg(H2RoughEnvCfg):
         self.observations.policy.height_scan = None
         # no terrain curriculum
         self.curriculum.terrain_levels = None
-        self.rewards.feet_air_time.weight = 0.75
-        self.rewards.feet_air_time.params["threshold"] = 0.40
+        self.rewards.feet_air_time.weight = 1.5
+        self.rewards.feet_air_time.params["threshold"] = 0.32
 
 
 class H2FlatEnvCfg_PLAY(H2FlatEnvCfg):
@@ -39,4 +39,3 @@ class H2FlatEnvCfg_PLAY(H2FlatEnvCfg):
         # remove random pushing
         self.events.base_external_force_torque = None
         self.events.push_robot = None
-
